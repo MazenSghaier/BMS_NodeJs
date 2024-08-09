@@ -1,0 +1,68 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Invoice {
+  amount            Float?
+  createdAt         DateTime         @default(now())
+  creationDate      DateTime?
+  deliveryVoucher   DeliveryVoucher? @relation(fields: [deliveryVoucherId], references: [id])
+  deliveryVoucherId String?
+  id                String           @id @default(cuid())
+  invoiceNumber     String?
+  updatedAt         DateTime         @updatedAt
+}
+
+model Payment {
+  amount     Float?
+  createdAt  DateTime  @default(now())
+  customer   Customer? @relation(fields: [customerId], references: [id])
+  customerId String?
+  date       DateTime?
+  id         String    @id @default(cuid())
+  updatedAt  DateTime  @updatedAt
+}
+
+model Customer {
+  address        String?
+  createdAt      DateTime  @default(now())
+  customerNumber String?
+  email          String?
+  id             String    @id @default(cuid())
+  name           String?
+  orders         Order[]
+  payments       Payment[]
+  phone          String?
+  updatedAt      DateTime  @updatedAt
+  vatNumber      String?
+}
+
+model DeliveryVoucher {
+  createdAt    DateTime  @default(now())
+  creationDate DateTime?
+  customerInfo Json?
+  details      Json?
+  id           String    @id @default(cuid())
+  invoices     Invoice[]
+  order        Order?    @relation(fields: [orderId], references: [id])
+  orderId      String?
+  updatedAt    DateTime  @updatedAt
+}
+
+model Order {
+  createdAt         DateTime          @default(now())
+  customer          Customer?         @relation(fields: [customerId], references: [id])
+  customerId        String?
+  deliveryVouchers  DeliveryVoucher[]
+  id                String            @id @default(cuid())
+  quantity          Int?
+  reference         String?
+  stockAvailability Boolean?
+  unitPrice         Float?
+  updatedAt         DateTime          @updatedAt
+}
